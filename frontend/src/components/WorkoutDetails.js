@@ -1,10 +1,16 @@
 import React from 'react'
 import {useWorkoutsContext} from "../hooks/useWorkoutsContext"
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
+import { useAuthContext } from '../hooks/useAuthContext'
 
 function WorkoutDetails({workout}) {
   const {dispatch} = useWorkoutsContext()
+  const {user} = useAuthContext()
+
   const handleClick = () => {
+    if(!user){
+      return
+    }
     document.getElementById('confirmationModal').style.display = 'block';
   };
   
@@ -12,7 +18,10 @@ function WorkoutDetails({workout}) {
     document.getElementById('confirmationModal').style.display = 'none';
     
     const response = await fetch('/api/workouts/' + workout._id, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers:{
+        'Authorization' : `Bearer ${user.token}`
+      }
     });
   
     if (response.ok) {
